@@ -1,8 +1,27 @@
 const express = require('express');
 const router = express.Router();
+const jwt = require('jsonwebtoken');
 const Comida = require('../models/comida');
+const Usuario = require('../models/login');
 
-// CONSULTAR TODOS
+// Middleware para crear un token JWT
+function crearToken(usuario) {
+  return jwt.sign({ usuario }, JWT_SECRET, { expiresIn: '1h' });
+}
+
+// Ruta de inicio de sesión para obtener el token JWT
+router.post('/login', async (req, res) => {
+  const { usuario, contraseña } = req.body; // Aquí deberías tener un método seguro para autenticar
+
+  // Ejemplo básico de autenticación
+  if (usuario === 'usuario_demo' && contraseña === 'contraseña_demo') {
+    const token = crearToken(usuario);
+    res.json({ mensaje: 'Inicio de sesión exitoso', token });
+  } else {
+    res.status(401).json({ mensaje: 'Credenciales inválidas' });
+  }
+});
+
 router.get('/comida', async (req, res) => {
   try {
     const comidas = await Comida.find();
@@ -47,6 +66,20 @@ router.post('/comida', async (req, res) => {
   }
 });
 
+async function obtenerComidaPorNombre(req, res, next) {
+  let comida;
+  try {
+    comida = await Comida.findOne({ nombre: req.params.nombre });
+    if (comida == null) {
+      return res.status(404).json({ mensaje: 'Platillo no encontrado' });
+    }
+  } catch (err) {
+    return res.status(500).json({ mensaje: err.message });
+  }
+
+  res.comida = comida;
+  next();
+}
 // ACTUALIZAR
 router.put('/comida/:nombre', obtenerComidaPorNombre, async (req, res) => {
   if (req.body.nombre != null) {
@@ -69,7 +102,6 @@ router.put('/comida/:nombre', obtenerComidaPorNombre, async (req, res) => {
     res.status(400).json({ mensaje: err.message });
   }
 });
-
 // ELIMINAR POR NOMBRE
 router.delete('/comida/:nombre', async (req, res) => {
   try {
@@ -82,19 +114,4 @@ router.delete('/comida/:nombre', async (req, res) => {
     res.status(500).json({ mensaje: err.message });
   }
 });
-
-async function obtenerComidaPorNombre(req, res, next) {
-  let comida;
-  try {
-    comida = await Comida.findOne({ nombre: req.params.nombre });
-    if (comida == null) {
-      return res.status(404).json({ mensaje: 'Platillo no encontrado' });
-    }
-  } catch (err) {
-    return res.status(500).json({ mensaje: err.message });
-  }
-
-  res.comida = comida;
-  next();
-}
 module.exports = router;
