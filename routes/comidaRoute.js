@@ -1,16 +1,47 @@
 const express = require('express');
+const jwt = require('jsonwebtoken');
 const router = express.Router();
 const Comida = require('../models/comida');
+require('dotenv').config();
 
 // CONSULTAR TODOS
-router.get('/comida', async (req, res) => {
-  try {
-    const comidas = await Comida.find();
-    res.json(comidas);
-  } catch (err) {
-    res.status(500).json({ mensaje: err.message });
-  }
+router.get('/comida', asegurarToken, async (req, res) => {
+  jwt.verify(req.token, process.env.SECRET_KEY, async (err, data) => {
+    if (err) {
+      return res.sendStatus(403);
+    } else {
+      try {
+        const comidas = await Comida.find();
+        res.json(comidas);
+      } catch (err) {
+        res.status(500).json({ mensaje: err.message });
+      }
+    }
+  });
 });
+
+// RUTA PARA INICIAR SESIÓN
+router.post('/login', (req, res) => {
+  const usuario = { id: 3 };
+  const token = jwt.sign({ usuario }, process.env.SECRET_KEY);
+  
+  res.json({
+    token
+  });
+});
+
+// FUNCIÓN PARA VERIFICAR TOKEN
+function asegurarToken(req, res, next) {
+  const encabezadoBearer = req.headers['authorization'];
+  if (typeof encabezadoBearer !== 'undefined') {
+    const bearer = encabezadoBearer.split(' ');
+    const tokenBearer = bearer[1];
+    req.token = tokenBearer;
+    next();
+  } else {
+    res.sendStatus(403);
+  }
+}
 
 // CONSULTAR POR NOMBRE
 router.get('/comida/:nombre', obtenerComidaPorNombre, (req, res) => {
@@ -40,11 +71,11 @@ router.post('/comida', async (req, res) => {
   });
 
   try {
-    const agregarComida = await comida.save();
-    res.status(201).json(agregarComida);
+    const comidaAgregada = await comida.save();
+    res.status(201).json(comidaAgregada);
   } catch (err) {
-    res.status(400).json({ mensaje: err.message });
-  }
+    res.status(400).json({ mensaje: err.message });
+  }
 });
 
 // ACTUALIZAR
@@ -97,4 +128,5 @@ async function obtenerComidaPorNombre(req, res, next) {
   res.comida = comida;
   next();
 }
+
 module.exports = router;
