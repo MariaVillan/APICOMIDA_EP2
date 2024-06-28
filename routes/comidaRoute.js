@@ -5,19 +5,13 @@ const Comida = require('../models/comida');
 require('dotenv').config();
 
 // CONSULTAR TODOS
-router.get('/comida', asegurarToken, async (req, res) => {
-  jwt.verify(req.token, process.env.SECRET_KEY, async (err, data) => {
-    if (err) {
-      return res.sendStatus(403);
-    } else {
-      try {
-        const comidas = await Comida.find();
-        res.json(comidas);
-      } catch (err) {
-        res.status(500).json({ mensaje: err.message });
-      }
-    }
-  });
+router.get('/comida', async (req, res) => {
+  try {
+    const comidas = await Comida.find();
+    res.json(comidas);
+  } catch (err) {
+    res.status(500).json({ mensaje: err.message });
+  }
 });
 
 // RUTA PARA INICIAR SESIÓN
@@ -62,7 +56,7 @@ router.get('/comida/categoria/:categoria', async (req, res) => {
 });
 
 // INSERTAR
-router.post('/comida', async (req, res) => {
+router.post('/comida', asegurarToken, async (req, res) => {
   const comida = new Comida({
     nombre: req.body.nombre,
     precio: req.body.precio,
@@ -79,7 +73,7 @@ router.post('/comida', async (req, res) => {
 });
 
 // ACTUALIZAR
-router.put('/comida/:nombre', obtenerComidaPorNombre, async (req, res) => {
+router.put('/comida/:nombre', asegurarToken, obtenerComidaPorNombre, async (req, res) => {
   if (req.body.nombre != null) {
     res.comida.nombre = req.body.nombre;
   }
@@ -102,7 +96,7 @@ router.put('/comida/:nombre', obtenerComidaPorNombre, async (req, res) => {
 });
 
 // ELIMINAR POR NOMBRE
-router.delete('/comida/:nombre', async (req, res) => {
+router.delete('/comida/:nombre', asegurarToken, async (req, res) => {
   try {
     const comidaEliminada = await Comida.findOneAndDelete({ nombre: req.params.nombre });
     if (!comidaEliminada) {
