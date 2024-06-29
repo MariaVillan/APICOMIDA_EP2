@@ -1,5 +1,6 @@
 const express = require ("express")
-const morgan = require ("morgan")
+const morgan = require ("morgan");
+const jwt = require ("jsonwebtoken")
 const app = express()
 const port = 3500
 const connectDB = require('./config/database');
@@ -16,11 +17,14 @@ app.use(morgan('dev'))
 
 app.use('/api', comidaRoute)
 
+<<<<<<< HEAD
 // Autenticación
 app.use('/api', authRouter);
 
 // Protección
 app.use('/api', autenticar, comidaRoute);
+=======
+>>>>>>> 721ec55f89db2007c16aa7abf8c7fa79cea0d197
 
 
 app.use((req, res) => {
