@@ -1,16 +1,21 @@
-const mongoose = require('mongoose');
+const { MongoClient } = require('mongodb');
+require('dotenv').config(); // Asegúrate de que dotenv esté configurado correctamente
 
-const connectDB = async () => {
+const uri = process.env.MONGODB_URI; // Asegúrate de que MONGODB_URI está definido en tu archivo .env
+
+const client = new MongoClient(uri, {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+});
+
+async function connectDB() {
   try {
-    await mongoose.connect('mongodb://localhost:27017/apicomida', {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
-    });
-    console.log('Conectado con MongoDB...');
-  } catch (err) {
-    console.error(err.message);
-    process.exit(1);
+    await client.connect();
+    console.log("Connected to MongoDB Atlas successfully!");
+  } catch (error) {
+    console.error("Failed to connect to MongoDB Atlas", error);
+    throw error;
   }
-};
+}
 
 module.exports = connectDB;
