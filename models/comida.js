@@ -25,4 +25,5 @@ const comidaSchema = new mongoose.Schema({
 }, {
   timestamps: true 
 });
-module.exports = mongoose.model('Comida', comidaSchema);
+const Comida = mongoose.model('Comida', comidaSchema);
+module.exports = Comida;

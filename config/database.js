@@ -1,24 +1,19 @@
-const { MongoClient, ServerApiVersion } = require('mongodb');
-require('dotenv').config();
+const { MongoClient } = require('mongodb');
+require('dotenv').config(); // Asegúrate de que dotenv esté configurado correctamente
 
-const uri = process.env.MONGODB_URI;
+const uri = process.env.MONGODB_URI; // Asegúrate de que MONGODB_URI está definido en tu archivo .env
 
 const client = new MongoClient(uri, {
-  serverApi: {
-    version: ServerApiVersion.v1,
-    strict: true,
-    deprecationErrors: true,
-  },
-  tls: true
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
 });
 
 async function connectDB() {
   try {
     await client.connect();
-    await client.db("admin").command({ ping: 1 });
-    console.log("Pinged your deployment. You successfully connected to MongoDB!");
+    console.log("Connected to MongoDB Atlas successfully!");
   } catch (error) {
-    console.error("Failed to connect to MongoDB", error);
+    console.error("Failed to connect to MongoDB Atlas", error);
     throw error;
   }
 }
