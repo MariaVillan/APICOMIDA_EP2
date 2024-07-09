@@ -17,14 +17,11 @@ app.use(morgan('dev'))
 
 app.use('/api', comidaRoute)
 
-<<<<<<< HEAD
 // Autenticación
 app.use('/api', authRouter);
 
 // Protección
 app.use('/api', autenticar, comidaRoute);
-=======
->>>>>>> 721ec55f89db2007c16aa7abf8c7fa79cea0d197
 
 
 app.use((req, res) => {
@@ -34,5 +31,3 @@ app.use((req, res) => {
 app.listen(port,()=> {
     console.log(`Aplicacion corriendo por el puerto ${port}`)
 })
-
-
